@@ -20,7 +20,56 @@ INCIDENT_ROUNDED_DATETIME string)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 LOCATION '/user/am13018_nyu_edu/fire_outputs/output_1';
 ```
-
+```
+CREATE EXTERNAL TABLE weather (
+    capture_time STRING,
+    temperature FLOAT,
+    precipitation FLOAT,
+    rain FLOAT,
+    cloudcover_percent FLOAT,
+    cloudcover_low_percent FLOAT,
+    cloudcover_mid_percent FLOAT,
+    cloudcover_high_percent FLOAT,
+    windspeed FLOAT,
+    winddirection FLOAT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+LOCATION '/user/ag8733_nyu_edu/project_weather/output';
+```
+```
+CREATE EXTERNAL TABLE census (
+    year INT,
+    zipcode INT,
+   borough STRING,
+    meanIncome DOUBLE,
+    meanIncome_latino DOUBLE,
+    meanIncome_white DOUBLE,
+    meanIncome_black DOUBLE,
+    meanIncome_asian DOUBLE,
+    medianIncome DOUBLE,
+    medianIncome_latino DOUBLE,
+    medianIncome_white DOUBLE,
+    medianIncome_black DOUBLE,
+    medianIncome_asian DOUBLE,
+    tot_pop INT,
+    tot_children INT,
+    tot_oldies INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+LOCATION '/user/ag8733_nyu_edu/Census_bor/output';
+```
+```
+CREATE EXTERNAL TABLE decennial (
+    zipcode INT,
+    population INT,
+    housing_units INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+LOCATION '/user/ag8733_nyu_edu/project_decennial/output';
+```
 ## Presto queries for analyzing datasets
 
 1. Borough-wise count of fire incidents
