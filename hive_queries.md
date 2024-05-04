@@ -255,4 +255,59 @@ SELECT borough, police_precinct, COUNT(*) as incident_count FROM fire_incident G
         windspeed_frequency 
     ORDER BY
         windspeed_ranges.windspeed_range;
+``` 
+11.Borough wise Fire incidents in year 2011-2020
+```
+SELECT borough, COUNT(zipcode) AS total_incident 
+FROM fire_incident WHERE YEAR(incident_datetime) BETWEEN 2011 AND 2020 
+GROUP BY borough;
+```
+12. Borough wise population,housing units, housing fires and total fires in years 2011-2020
+```
+SELECT p.borough, p.total_pop, p.total_housing, f.total_incident, f.housing_fire_incidents from 
+(SELECT borough,SUM(population) as total_pop,SUM(housing_units) as total_housing from decennial group by borough) as p,
+(SELECT borough, COUNT(zipcode) AS total_incident ,
+        COUNT(CASE WHEN incident_class_group IN ('Multiple Dwelling ''A'' - Food on the stove fire',
+                                                'Multiple Dwelling ''B'' Fire',
+                                                'Multiple Dwelling ''A'' - Other fire',
+                                                'Multiple Dwelling ''A'' - Compactor fire',
+                                                ' Private Dwelling Fire')
+                THEN incident_datetime END) AS housing_fire_incidents
+FROM fire_incident WHERE YEAR(incident_datetime) BETWEEN 2011 AND 2020 
+GROUP BY borough) as f where p.borough=f.borough;
+```
+
+13. Total meanIncome of the borough and races living in the borough
+```
+select * from 
+(select borough,sum(meanIncome)/10 as meanIncome, 
+sum(meanIncome_white)/10 meanIncome_white, 
+sum(meanIncome_black)/10 meanIncome_black ,
+sum(meanIncome_asian)/10 meanIncome_asian,
+sum(medianIncome)/10 as medianIncome, 
+sum(medianIncome_white)/10 medianIncome_white, 
+sum(medianIncome_black)/10 mediaanIncome_black ,
+sum(medianIncome_asian)/10 medianIncome_asian
+from census group by borough) as income
+inner join 
+(SELECT borough, COUNT(zipcode) AS total_incident 
+FROM fire_incident WHERE YEAR(incident_datetime) BETWEEN 2011 AND 2020 
+GROUP BY borough) as fire on income.borough=fire.borough;
+```
+14. Per-capita mean Income of people 
+```SELECT income.borough,
+        income.meanIncome,
+        income.medianIncome,
+        fire.total_incident 
+FROM 
+    (SELECT borough , 
+        SUM(meanIncome*tot_pop)/SUM(tot_pop) as meanIncome, 
+        AVG(medianIncome) as medianIncome
+    FROM census group by borough) as income 
+inner join 
+    (SELECT borough, 
+        COUNT(zipcode) AS total_incident 
+    FROM fire_incident WHERE EXTRACT(YEAR FROM CAST(incident_datetime AS TIMESTAMP)) BETWEEN 2011 AND 2020 
+    GROUP BY borough) as fire 
+on income.borough=fire.borough;
 ```
