@@ -40,8 +40,7 @@ SELECT borough, police_precinct, COUNT(*) as incident_count FROM fire_incident G
 ```
 
 4. Incidents average travel_time per borough across years
-``` select year(incident_datetime), borough, avg(travel_time_seconds) from fire_incident group by borough, year(incident_datetime) order by borough, year(inc
-ident_datetime);```
+``` select year(incident_datetime), borough, avg(travel_time_seconds) from fire_incident group by borough, year(incident_datetime) order by borough, year(incident_datetime);```
 
 5. Incidents average response_time per borough across years
 ``` select year(incident_datetime), borough, avg(response_time_seconds) from fire_incident group by borough, year(incident_datetime) order by borough, year(incident_datetime);```
