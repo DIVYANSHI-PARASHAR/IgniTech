@@ -647,3 +647,13 @@ LEFT JOIN
 
 ON i.borough = f.borough OR h.borough = f.borough;
 
+31. Counting fire_incidents for each borough
+```
+SELECT
+    borough,
+    COUNT(*) AS total_fire_incidents
+FROM
+    fire_incident
+GROUP BY
+    borough;
+```
