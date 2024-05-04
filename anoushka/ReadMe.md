@@ -14,6 +14,9 @@
 ### Mean Income Data Cleaning
 `hadoop jar MeanIncome.jar MeanIncome MeanIncome MeanIncome/output`
 
+### Mean Income Data Profiler
+`hadoop jar meanProfiler.jar MeanProfiler meanProfiler/alldata_clean.txt meanProfiler/output`
+
 ### Median Income Data Cleaning
 `hadoop jar MedianIncome.jar MedianIncome MedianIncome MediaanIncome/output`
 
@@ -22,6 +25,7 @@
 
 ### Data Combiner map reduce for mean,median and age gender data
 `hadoop jar DataCombiner.jar DataCombiner DataCombiner/meanIncome_clean.txt DataCombiner/medianIncome_clean.txt DataCombiner/ageGender_clean.txt DataCombiner/output`
+
 
 
   
