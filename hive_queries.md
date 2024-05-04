@@ -340,3 +340,84 @@ inner join
     GROUP BY borough) as fire 
 on income.borough=fire.borough;
 ```
+
+14. Average number of Inspections every year
+```
+SELECT year, AVG(inspection_count) AS avg_inspections_per_year
+FROM (
+    SELECT year, COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY year
+) AS yearly_inspections
+GROUP BY year;
+
+Total no. of inspection every year-
+SELECT year, SUM(inspection_count) AS total_inspections_per_year
+FROM (
+    SELECT year, COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY year
+) AS yearly_inspections
+GROUP BY year;
+```
+
+15. List average inspections, total inspections, status-wise inspections for each year
+```
+SELECT 
+    year,
+    AVG(inspection_count) AS avg_inspections_per_year,
+    SUM(inspection_count) AS total_inspections_per_year,
+    SUM(CASE WHEN status = 'APPROVAL' THEN inspection_count ELSE 0 END) AS total_approved_inspections,
+    SUM(CASE WHEN status LIKE 'NOT%' THEN inspection_count ELSE 0 END) AS total_not_approved_inspections
+FROM (
+    SELECT 
+        year, 
+        status,
+        COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY year, status
+) AS yearly_inspection_status
+GROUP BY year;
+```
+
+16. List average inspections, total inspections, status-wise inspections for each borough each year
+```
+SELECT 
+    borough,
+    year,
+    AVG(inspection_count) AS avg_inspections_per_year,
+    SUM(inspection_count) AS total_inspections_per_year,
+    SUM(CASE WHEN status = 'APPROVAL' THEN inspection_count ELSE 0 END) AS total_approved_inspections,
+    SUM(CASE WHEN status LIKE 'NOT%' THEN inspection_count ELSE 0 END) AS total_not_approved_inspections
+FROM (
+    SELECT 
+        borough,
+        year, 
+        status,
+        COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY borough, year, status
+) AS yearly_inspection_status
+GROUP BY borough, year;
+```
+
+17. List average inspections, total inspections, status-wise inspections for each ZIP CODE each year
+```
+SELECT 
+    zipcode,
+    year,
+    AVG(inspection_count) AS avg_inspections_per_year,
+    SUM(inspection_count) AS total_inspections_per_year,
+    SUM(CASE WHEN status = 'APPROVAL' THEN inspection_count ELSE 0 END) AS total_approved_inspections,
+    SUM(CASE WHEN status LIKE 'NOT%' THEN inspection_count ELSE 0 END) AS total_not_approved_inspections
+FROM (
+    SELECT 
+        zipcode,
+        year, 
+        status,
+        COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY zipcode, year, status
+) AS yearly_inspection_status
+GROUP BY zipcode, year;
+```
