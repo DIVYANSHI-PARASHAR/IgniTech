@@ -1,6 +1,6 @@
 ## Creating tables
 
-
+```
 CREATE EXTERNAL TABLE fire_incident
 (BOROUGH string,
 ZIPCODE int, 
@@ -19,6 +19,7 @@ LADDERS_ASSIGNED int,
 INCIDENT_ROUNDED_DATETIME string)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 LOCATION '/user/am13018_nyu_edu/fire_outputs/output_1';
+```
 
 ## Presto queries for analyzing datasets
 
