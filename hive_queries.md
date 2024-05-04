@@ -70,6 +70,35 @@ ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 LOCATION '/user/ag8733_nyu_edu/project_decennial/output';
 ```
+
+```
+CREATE TABLE hydrants (
+    borough STRING,
+    zipcode STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+LOAD DATA INPATH '/user/dp3635_nyu_edu/projectdata/cleanZipHydrant.txt' INTO TABLE hydrants;
+```
+
+```
+CREATE TABLE inspection (
+    insp_date STRING,
+    status STRING, 
+    zipcode INT, 
+    borough VARCHAR(255),
+    year INT
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ',' 
+STORED AS TEXTFILE;
+
+LOAD DATA INPATH '/user/dp3635_nyu_edu/projectdata/cleanInspection.txt' INTO TABLE inspection;
+```
+
+
 ## Presto queries for analyzing datasets
 
 1. Borough-wise count of fire incidents
