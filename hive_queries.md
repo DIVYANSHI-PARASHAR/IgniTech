@@ -659,3 +659,28 @@ FROM
 GROUP BY
     borough;
 ```
+
+32. Total incidents and hydrants for each borough
+```
+SELECT
+    COALESCE(f.borough, h.borough) AS borough,
+    COALESCE(total_fire_incidents, 0) AS total_fire_incidents,
+    COALESCE(total_hydrants, 0) AS total_hydrants
+FROM
+    (SELECT
+        borough,
+        COUNT(*) AS total_fire_incidents
+    FROM
+        fire_incident
+    GROUP BY
+        borough) AS f
+FULL OUTER JOIN
+    (SELECT
+        borough,
+        COUNT(*) AS total_hydrants
+    FROM
+        hydrants
+    GROUP BY
+        borough) AS h
+ON f.borough = h.borough;
+```
