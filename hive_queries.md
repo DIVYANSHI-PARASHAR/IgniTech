@@ -51,4 +51,157 @@ SELECT borough, police_precinct, COUNT(*) as incident_count FROM fire_incident G
 7. Count number of incident for each incident class(Private Dwelling Fire, School Fire, Automobile Fire, etc)
 ```select incident_class_group, incident_class, count(*) from fire_incident group by incident_class, incident_class_group;```
 
+8. Count number of incidents for every temperature range - defined four temp ranges (<0, 0-15, 15-30, 30+)
 
+    ``` SELECT
+        temperature_ranges.temperature_range,
+        COUNT(*) AS incident_count,
+        temperature_frequency                         
+    FROM
+        (                             SELECT
+            CASE                                      
+                WHEN temperature < 0 THEN '<0'                                     
+                WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
+                WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                     
+                ELSE '30 '                                 
+            END AS temperature_range,
+            CAST(temperature AS DOUBLE) AS temperature,
+            capture_time                             
+        FROM
+            weather                         ) AS temperature_ranges                         
+    INNER JOIN
+        fire_incident 
+            ON fire_incident.incident_rounded_datetime = temperature_ranges.capture_time                         
+    LEFT JOIN
+        (
+            SELECT
+                CASE                                      
+                    WHEN temperature < 0 THEN '<0'                                     
+                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
+                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                     
+                    ELSE '30 '                                 
+                END AS temperature_range,
+                COUNT(*) AS temperature_frequency                             
+            FROM
+                weather                             
+            GROUP BY
+                CASE                                      
+                    WHEN temperature < 0 THEN '<0'                                     
+                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
+                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                 
+                    ELSE '30 '                                 
+                END                         
+        ) AS temperature_frequency_counts 
+            ON temperature_ranges.temperature_range = temperature_frequency_counts.temperature_range                         
+    GROUP BY
+        temperature_ranges.temperature_range,
+        temperature_frequency                         
+    ORDER BY
+        temperature_ranges.temperature_range;
+    ```
+
+9. Count number of incidents for every precipitation range - defined four precipitation ranges (No rain, light showers, moderate showers, and heavy showers)
+
+```
+    SELECT
+        precipitation_ranges.precipitation_range,
+        COUNT() AS incident_count,
+        precipitation_frequency 
+    FROM
+        ( SELECT
+            CASE 
+                WHEN precipitation =0.0 THEN 'No rain' 
+                WHEN precipitation >= 0.1 
+                AND precipitation<=0.9 THEN 'Light Showers' 
+                WHEN precipitation BETWEEN 1.0 AND 10 THEN 'Moderate Showers' 
+                ELSE 'Heavy Showers' 
+            END AS precipitation_range,
+            CAST(precipitation AS DOUBLE) AS precipitation,
+            capture_time 
+        FROM
+            weather ) AS precipitation_ranges 
+    INNER JOIN
+        fire_incident 
+            ON fire_incident.incident_rounded_datetime = precipitation_ranges.capture_time 
+    LEFT JOIN
+        (
+            SELECT
+                CASE 
+                    WHEN precipitation =0.0 THEN 'No rain' 
+                    WHEN precipitation >= 0.1 
+                    AND precipitation<=0.9 THEN 'Light Showers' 
+                    WHEN precipitation BETWEEN 1.0 AND 10 THEN 'Moderate Showers' 
+                    ELSE 'Heavy Showers' 
+                END AS precipitation_range,
+                COUNT() AS precipitation_frequency 
+            FROM
+                weather 
+            GROUP BY
+                CASE 
+                    WHEN precipitation =0.0 THEN 'No rain' 
+                    WHEN precipitation >= 0.1 
+                    AND precipitation<=0.9 THEN 'Light Showers' 
+                    WHEN precipitation BETWEEN 1.0 AND 10 THEN 'Moderate Showers' 
+                    ELSE 'Heavy Showers' 
+                END 
+        ) AS precipitation_frequency_counts 
+            ON precipitation_ranges.precipitation_range = precipitation_frequency_counts.precipitation_range 
+    GROUP BY
+        precipitation_ranges.precipitation_range,
+        precipitation_frequency 
+    ORDER BY
+        precipitation_ranges.precipitation_range;
+```
+
+10. Count number of incidents for all windspeed ranges - defined five windspeed ranges (<10, 10-20, 20-30, 30-40, 40+)
+
+```
+    SELECT
+        windspeed_ranges.windspeed_range,
+        COUNT() AS incident_count,
+        windspeed_frequency 
+    FROM
+        ( SELECT
+            CASE 
+                WHEN windspeed BETWEEN 0.0 AND 10.0THEN '<10' 
+                WHEN windspeed BETWEEN 10 AND 20 THEN '10-20' 
+                WHEN windspeed BETWEEN 20 AND 30 THEN '20-30' 
+                WHEN windspeed BETWEEN 30 AND 40 THEN '30-40' 
+                ELSE '40 ' 
+            END AS windspeed_range,
+            CAST(windspeed AS DOUBLE) AS windspeed,
+            capture_time 
+        FROM
+            weather ) AS windspeed_ranges 
+    INNER JOIN
+        fire_incident 
+            ON fire_incident.incident_rounded_datetime = windspeed_ranges.capture_time 
+    LEFT JOIN
+        (
+            SELECT
+                CASE 
+                    WHEN windspeed BETWEEN 0.0 AND 10.0THEN '<10' 
+                    WHEN windspeed BETWEEN 10 AND 20 THEN '10-20' 
+                    WHEN windspeed BETWEEN 20 AND 30 THEN '20-30' 
+                    WHEN windspeed BETWEEN 30 AND 40 THEN '30-40' 
+                    ELSE '40 ' 
+                END AS windspeed_range,
+                COUNT() AS windspeed_frequency 
+            FROM
+                weather 
+            GROUP BY
+                CASE 
+                    WHEN windspeed BETWEEN 0.0 AND 10.0THEN '<10' 
+                    WHEN windspeed BETWEEN 10 AND 20 THEN '10-20' 
+                    WHEN windspeed BETWEEN 20 AND 30 THEN '20-30' 
+                    WHEN windspeed BETWEEN 30 AND 40 THEN '30-40' 
+                    ELSE '40 ' 
+                END 
+        ) AS windspeed_frequency_counts 
+            ON windspeed_ranges.windspeed_range = windspeed_frequency_counts.windspeed_range 
+    GROUP BY
+        windspeed_ranges.windspeed_range,
+        windspeed_frequency 
+    ORDER BY
+        windspeed_ranges.windspeed_range;
+```
