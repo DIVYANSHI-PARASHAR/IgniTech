@@ -609,6 +609,7 @@ ON CAST(i.zipcode AS VARCHAR) = CAST(f.zipcode AS VARCHAR) OR CAST(h.zipcode AS 
 
 
 30. Total inspections, hydrants and incidents for each borough
+```
 SELECT
     COALESCE(i.borough, h.borough, f.borough) AS borough,
     COALESCE(total_inspections, 0) AS total_inspections,
@@ -646,6 +647,7 @@ LEFT JOIN
         fire_incident.borough) AS f
 
 ON i.borough = f.borough OR h.borough = f.borough;
+```
 
 31. Counting fire_incidents for each borough
 ```
