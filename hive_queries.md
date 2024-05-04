@@ -53,49 +53,51 @@ SELECT borough, police_precinct, COUNT(*) as incident_count FROM fire_incident G
 
 8. Count number of incidents for every temperature range - defined four temp ranges (<0, 0-15, 15-30, 30+)
 
-    ``` SELECT
+    ``` 
+
+    SELECT
         temperature_ranges.temperature_range,
-        COUNT(*) AS incident_count,
-        temperature_frequency                         
+        COUNT() AS incident_count,
+        temperature_frequency 
     FROM
-        (                             SELECT
-            CASE                                      
-                WHEN temperature < 0 THEN '<0'                                     
-                WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
-                WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                     
-                ELSE '30 '                                 
+        ( SELECT
+            CASE 
+                WHEN temperature < 0 THEN '<0' 
+                WHEN temperature BETWEEN 0 AND 15 THEN '0-15' 
+                WHEN temperature BETWEEN 15 AND 30 THEN '15-30' 
+                ELSE '30 ' 
             END AS temperature_range,
             CAST(temperature AS DOUBLE) AS temperature,
-            capture_time                             
+            capture_time 
         FROM
-            weather                         ) AS temperature_ranges                         
+            weather ) AS temperature_ranges 
     INNER JOIN
         fire_incident 
-            ON fire_incident.incident_rounded_datetime = temperature_ranges.capture_time                         
+            ON fire_incident.incident_rounded_datetime = temperature_ranges.capture_time 
     LEFT JOIN
         (
             SELECT
-                CASE                                      
-                    WHEN temperature < 0 THEN '<0'                                     
-                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
-                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                     
-                    ELSE '30 '                                 
+                CASE 
+                    WHEN temperature < 0 THEN '<0' 
+                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15' 
+                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30' 
+                    ELSE '30 ' 
                 END AS temperature_range,
-                COUNT(*) AS temperature_frequency                             
+                COUNT() AS temperature_frequency 
             FROM
-                weather                             
+                weather 
             GROUP BY
-                CASE                                      
-                    WHEN temperature < 0 THEN '<0'                                     
-                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15'                                     
-                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30'                                 
-                    ELSE '30 '                                 
-                END                         
+                CASE 
+                    WHEN temperature < 0 THEN '<0' 
+                    WHEN temperature BETWEEN 0 AND 15 THEN '0-15' 
+                    WHEN temperature BETWEEN 15 AND 30 THEN '15-30' 
+                    ELSE '30 ' 
+                END 
         ) AS temperature_frequency_counts 
-            ON temperature_ranges.temperature_range = temperature_frequency_counts.temperature_range                         
+            ON temperature_ranges.temperature_range = temperature_frequency_counts.temperature_range 
     GROUP BY
         temperature_ranges.temperature_range,
-        temperature_frequency                         
+        temperature_frequency 
     ORDER BY
         temperature_ranges.temperature_range;
     ```
