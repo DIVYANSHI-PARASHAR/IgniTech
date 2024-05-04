@@ -421,3 +421,30 @@ FROM (
 ) AS yearly_inspection_status
 GROUP BY zipcode, year;
 ```
+
+18. Count of inspection by status:
+```
+SELECT status,
+COUNT(*) AS inspection_count
+FROM inspection
+GROUP BY status;
+```
+
+19. Number of inspections in each borough
+```
+SELECT borough, COUNT(*) AS inspection_count
+FROM inspection
+GROUP BY borough;
+```
+
+20. Number of inspections in each zip code:
+```
+SELECT zipcode, COUNT(*) AS inspection_count
+FROM inspection
+GROUP BY zipcode;
+```
+
+21. Number of inspection for each zip code of one particular borough:
+```
+SELECT zipcode, COUNT(*) AS inspection_count FROM inspection WHERE borough = 'Borough-Name' GROUP BY zipcode;
+```
