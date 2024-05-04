@@ -448,3 +448,202 @@ GROUP BY zipcode;
 ```
 SELECT zipcode, COUNT(*) AS inspection_count FROM inspection WHERE borough = 'Borough-Name' GROUP BY zipcode;
 ```
+
+22. Inspection Frequency Analysis:
+```
+SELECT
+    borough,
+    COUNT(*) AS num_inspections,
+    MIN(insp_date) AS first_inspection,
+    MAX(insp_date) AS last_inspection
+FROM
+    inspection
+GROUP BY
+    borough
+ORDER BY
+    num_inspections DESC;
+```
+
+23. Number of hydrants for every borough:
+```
+SELECT borough, COUNT(*) AS total_hydrants
+FROM hydrants
+GROUP BY borough;
+```
+
+24. Count the total number of hydrants in each borough and zip code combination:
+```
+SELECT borough, zipcode, COUNT(*) AS total_hydrants
+FROM hydrants
+GROUP BY borough, zipcode;
+```
+
+25. Number of hydrants for each zip code of one particular borough:
+```
+SELECT zipcode, COUNT(*) AS total_hydrants
+FROM hydrants
+WHERE borough = 'Borough-Name'
+GROUP BY zipcode;
+```
+
+26. Total number of inspections and hydrants for each zipcode of each borough:
+```
+SELECT h.zipcode, h.borough, COUNT(*) AS total_hydrants, i.inspection_count
+FROM hydrants h
+LEFT JOIN (
+    SELECT CAST(zipcode AS VARCHAR) AS zipcode, COUNT(*) AS inspection_count
+    FROM inspection
+    GROUP BY zipcode
+) AS i ON h.zipcode = i.zipcode
+GROUP BY h.zipcode, h.borough, i.inspection_count;
+```
+
+27. Total inspections and hydrants for every zipcode (removing rows where both are 0 for a zipcode)
+```
+SELECT
+    COALESCE(CAST(i.zipcode AS VARCHAR), h.zipcode) AS zipcode,
+    COALESCE(total_inspections, 0) AS total_inspections,
+    COALESCE(total_hydrants, 0) AS total_hydrants
+FROM
+    (SELECT
+        inspection.zipcode,
+        COUNT(*) AS total_inspections
+    FROM
+        inspection
+    WHERE
+        inspection.borough = 'MANHATTAN'
+    GROUP BY
+        inspection.zipcode) AS i
+
+JOIN
+
+    (SELECT
+        hydrants.zipcode,
+        COUNT(*) AS total_hydrants
+    FROM
+        hydrants
+    WHERE
+        hydrants.borough = 'MANHATTAN'
+    GROUP BY
+        hydrants.zipcode) AS h
+
+ON CAST(i.zipcode AS VARCHAR) = h.zipcode;
+
+```
+
+28. Total inspections and hydrants for each borough
+```
+SELECT
+    COALESCE(i.borough, h.borough) AS borough,
+    SUM(COALESCE(total_inspections, 0)) AS total_inspections,
+    SUM(COALESCE(total_hydrants, 0)) AS total_hydrants
+FROM
+    (SELECT
+        inspection.borough,
+        COUNT(*) AS total_inspections
+    FROM
+        inspection
+    GROUP BY
+        inspection.borough) AS i
+
+FULL JOIN
+
+    (SELECT
+        hydrants.borough,
+        COUNT(*) AS total_hydrants
+    FROM
+        hydrants
+    GROUP BY
+        hydrants.borough) AS h
+
+ON i.borough = h.borough
+GROUP BY
+    COALESCE(i.borough, h.borough);
+```
+
+29. Total inspections, hydrants and incidents for particular borough
+```
+SELECT
+    COALESCE(CAST(i.zipcode AS VARCHAR), CAST(h.zipcode AS VARCHAR), CAST(f.zipcode AS VARCHAR)) AS location,
+    COALESCE(total_inspections, 0) AS total_inspections,
+    COALESCE(total_hydrants, 0) AS total_hydrants,
+    COALESCE(total_fire_incidents, 0) AS total_fire_incidents
+FROM
+    (SELECT
+        inspection.zipcode,
+        COUNT(*) AS total_inspections
+    FROM
+        inspection
+    WHERE
+        inspection.borough = 'MANHATTAN'
+    GROUP BY
+        inspection.zipcode) AS i
+
+JOIN
+
+    (SELECT
+        hydrants.zipcode,
+        COUNT(*) AS total_hydrants
+    FROM
+        hydrants
+    WHERE
+        hydrants.borough = 'MANHATTAN'
+    GROUP BY
+        hydrants.zipcode) AS h
+
+ON CAST(i.zipcode AS VARCHAR) = CAST(h.zipcode AS VARCHAR)
+
+LEFT JOIN
+
+    (SELECT
+        fire_incident.borough,
+        fire_incident.zipcode,
+        COUNT(*) AS total_fire_incidents
+    FROM
+        fire_incident
+    GROUP BY
+        fire_incident.borough, fire_incident.zipcode) AS f
+
+ON CAST(i.zipcode AS VARCHAR) = CAST(f.zipcode AS VARCHAR) OR CAST(h.zipcode AS VARCHAR) = CAST(f.zipcode AS VARCHAR);
+```
+
+
+30. Total inspections, hydrants and incidents for each borough
+SELECT
+    COALESCE(i.borough, h.borough, f.borough) AS borough,
+    COALESCE(total_inspections, 0) AS total_inspections,
+    COALESCE(total_hydrants, 0) AS total_hydrants,
+    COALESCE(total_fire_incidents, 0) AS total_fire_incidents
+FROM
+    (SELECT
+        inspection.borough,
+        COUNT(*) AS total_inspections
+    FROM
+        inspection
+    GROUP BY
+        inspection.borough) AS i
+
+JOIN
+
+    (SELECT
+        hydrants.borough,
+        COUNT(*) AS total_hydrants
+    FROM
+        hydrants
+    GROUP BY
+        hydrants.borough) AS h
+
+ON i.borough = h.borough
+
+LEFT JOIN
+
+    (SELECT
+        fire_incident.borough,
+        COUNT(*) AS total_fire_incidents
+    FROM
+        fire_incident
+    GROUP BY
+        fire_incident.borough) AS f
+
+ON i.borough = f.borough OR h.borough = f.borough;
+
