@@ -1,4 +1,4 @@
-# IGNITECH : Fighting Fire With Data
+# IgniTech : Fighting Fire With Data
 
 Team Members : 
 1. Anoushka Gupta (ag8733)
